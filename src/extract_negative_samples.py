@@ -27,7 +27,7 @@ except:
     exit()
 
 win_w = 200
-win_h = 100
+win_h = 150
 step = 100
 i = 0
 for (x, y, window) in sliding_window(original_img, step, (win_w, win_h)):

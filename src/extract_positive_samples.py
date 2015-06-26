@@ -41,10 +41,10 @@ def plate_from_annotation(annotation):
 
 def crop_plate_image(img, plate):
     """Crop image region containing the license plate."""
-    xmin = min(p[0] for p in plate['points'])
-    xmax = max(p[0] for p in plate['points'])
-    ymin = min(p[1] for p in plate['points'])
-    ymax = max(p[1] for p in plate['points'])
+    xmin = min(p[0] for p in plate['points'])-10
+    xmax = max(p[0] for p in plate['points'])+10
+    ymin = min(p[1] for p in plate['points'])-10
+    ymax = max(p[1] for p in plate['points'])+10
     return img[ymin:ymax, xmin:xmax]
 
 
@@ -70,5 +70,6 @@ plate = plate_from_annotation(txt_path)
 
 cropped_img = crop_plate_image(original_img, plate)
 path = str(image_path.rsplit('.', 1)[0].rsplit('/', 1)[-1]) + '_plate' + '.jpg'
+print 'saving cropped image:', path
 cv2.imwrite(path, cropped_img)
 
