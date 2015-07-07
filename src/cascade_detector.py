@@ -80,6 +80,7 @@ else:
     (x, y, w, h) = plates[widths.index(min(widths))]
     cv2.rectangle(image, (x, y), (x+w, y+h), (0, 0, 255), 2)
     points = [x, y, x+w, y, x+w, y+h, x, y+h]
+    points = [int(p/ratio) for p in points]
     print ','.join(map(str, points)) + ',ABC1234'
 
 if args["show"]:
