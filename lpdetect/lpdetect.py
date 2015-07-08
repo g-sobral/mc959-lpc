@@ -174,8 +174,11 @@ else:
     points = [int(p/ratio) for p in points]
     print ','.join(map(str, points)) + ',ABC1234'
 
+    plate, r = resize(plate, width=150)
+
 if args["show"]:
     cv2.rectangle(image, (x, y), (x+w, y+h), (0, 255), 2)
-    cv2.imshow("Plates found", plate)
+    cv2.imshow(args["image"], image)
+    cv2.imshow("detected plate", plate)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
