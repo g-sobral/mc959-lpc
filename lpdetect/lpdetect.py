@@ -5,6 +5,8 @@ import sys
 import numpy as np
 import argparse
 
+import ocr
+
 def resize(image, width=None, height=None, inter=cv2.INTER_AREA):
     # initialize the dimensions of the image to be resized and
     # grab the image size
@@ -102,14 +104,24 @@ def four_point_transform(image, pts):
 ap = argparse.ArgumentParser()
 ap.add_argument('--cascade', default = 'cascade.xml',
                 help = 'Path to cascade classifier xml')
+ap.add_argument('--ocr_training_samples', default='trainingData.pkl',
+                help = 'Path to OCR training samples data (pickle file)')
+ap.add_argument('--ocr_training_classes', default='trainingClasses.data',
+                help = 'Path to OCR training classes data (numpy generated txt)')
 ap.add_argument('--show', action="store_true",
                 help = 'Show image with detected plates')
 ap.add_argument('image',
                 help = "Path to the image to be processed")
+ap.add_argument('--debug', action="store_true",
+                help = "Enables debug mode (OCR stuff mostly)")
 args = vars(ap.parse_args())
 
 # Create the cascade classifier
 classifier = cv2.CascadeClassifier(args["cascade"])
+
+# Create OCR and loads trainng data
+plateOCR = ocr.OCR(debug=args["debug"])
+plateOCR.loadTraningData(args["ocr_training_samples"], args["ocr_training_classes"])
 
 # Read, resize and convert image to grayscale
 image = cv2.imread(args["image"])
@@ -172,13 +184,16 @@ else:
 
     points = [x, y, x+w, y, x+w, y+h, x, y+h]
     points = [int(p/ratio) for p in points]
-    print ','.join(map(str, points)) + ',ABC1234'
 
-    plate, r = resize(plate, width=150)
+    if args["show"]:
+        cv2.rectangle(image, (x, y), (x+w, y+h), (0, 255), 2)
+        cv2.imshow(args["image"], image)
+        cv2.imshow("detected plate", plate)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()    
 
-if args["show"]:
-    cv2.rectangle(image, (x, y), (x+w, y+h), (0, 255), 2)
-    cv2.imshow(args["image"], image)
-    cv2.imshow("detected plate", plate)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    results, resultsPos, plateString = plateOCR.run(plate)
+
+    print ','.join(map(str, points)) + ',' + plateString
+
+
